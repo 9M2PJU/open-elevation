@@ -44,3 +44,11 @@ OPEN_ELEVATION_REGION_MAX_LONGITUDE: "104.0"
 
 Regional mode runs before whole-world mode. It clips the mounted source GeoTIFFs into `./data` and tiles only that area. It does not download regional source data by itself; your source files must already cover the requested bounding box.
 
+When `docker compose up --build` needs to build a dataset, the logs show clear phases:
+
+* active dataset mode: whole world, regional, or existing data
+* each SRTM archive download with resume status and final file size
+* archive extraction progress
+* extracted raster preparation
+* per-raster tiling progress with tile count and percentage
+* cleanup and final tile count

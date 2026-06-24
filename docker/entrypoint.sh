@@ -9,11 +9,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 mkdir -p "$DATA_DIR"
 
 if [ "$AUTO_BUILD_REGION" = "true" ] && ! find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+    echo "Open-Elevation dataset mode: regional"
     echo "No GeoTIFF files found in $DATA_DIR; building a regional dataset."
     "$SCRIPT_DIR/create-region-dataset.sh"
 elif [ "$AUTO_DOWNLOAD" = "true" ] && ! find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+    echo "Open-Elevation dataset mode: whole world"
     echo "No GeoTIFF files found in $DATA_DIR; downloading the whole-world SRTM dataset."
     "$SCRIPT_DIR/create-dataset.sh"
+elif find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+    echo "Open-Elevation dataset mode: existing data"
+    echo "Found GeoTIFF files in $DATA_DIR; skipping dataset download/build."
+else
+    echo "Open-Elevation dataset mode: no automatic dataset build"
+    echo "No GeoTIFF files found in $DATA_DIR."
 fi
 
 exec "$@"
