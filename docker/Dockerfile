@@ -1,10 +1,13 @@
-FROM osgeo/gdal:ubuntu-small-latest-amd64
+FROM ghcr.io/osgeo/gdal:ubuntu-small-latest
 
 RUN apt-get update
-RUN apt-get install -y libspatialindex-dev unar bc python3-pip wget
+RUN apt-get install -y libspatialindex-dev unar bc python3-pip python3-venv wget
 
 ADD ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN python3 -m venv --system-site-packages /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN grep -v '^GDAL==' requirements.txt > requirements-docker.txt \
+    && pip install --no-cache-dir -r requirements-docker.txt
 
 RUN mkdir /code
 ADD . /code/
