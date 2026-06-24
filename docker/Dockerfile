@@ -7,6 +7,7 @@ ADD ./requirements.txt .
 RUN python3 -m venv --system-site-packages /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN grep -v '^GDAL==' requirements.txt > requirements-docker.txt \
+    && pip install --no-cache-dir --upgrade pip wheel \
     && pip install --no-cache-dir -r requirements-docker.txt
 
 RUN mkdir /code
