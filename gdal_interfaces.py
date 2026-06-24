@@ -6,6 +6,16 @@ from os.path import isfile, join, getsize
 import json
 from rtree import index
 
+def use_traditional_axis_order(spatial_reference):
+    """
+    GDAL 3 may use authority-compliant EPSG:4326 axis order (latitude,
+    longitude). This project passes and stores coordinates as longitude,
+    latitude for raster transforms, so force the traditional GIS order when
+    GDAL exposes that setting.
+    """
+    if hasattr(osr, 'OAMS_TRADITIONAL_GIS_ORDER'):
+        spatial_reference.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
 # Originally based on https://stackoverflow.com/questions/13439357/extract-point-from-raster-in-gdal
 class GDALInterface(object):
     SEA_LEVEL = 0
@@ -32,10 +42,12 @@ class GDALInterface(object):
         if self.src is None:
             raise Exception('Could not load GDAL file "%s"' % self.tif_path)
         spatial_reference_raster = osr.SpatialReference(self.src.GetProjection())
+        use_traditional_axis_order(spatial_reference_raster)
 
         # get the WGS84 spatial reference
         spatial_reference = osr.SpatialReference()
         spatial_reference.ImportFromEPSG(4326)  # WGS84
+        use_traditional_axis_order(spatial_reference)
 
         # coordinate transformation
         self.coordinate_transform = osr.CoordinateTransformation(spatial_reference, spatial_reference_raster)
