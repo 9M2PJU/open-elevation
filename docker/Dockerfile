@@ -11,8 +11,10 @@ RUN grep -v '^GDAL==' requirements.txt > requirements-docker.txt \
 
 RUN mkdir /code
 ADD . /code/
+RUN chmod +x /code/docker/entrypoint.sh
 
 WORKDIR /code
+ENTRYPOINT ["/code/docker/entrypoint.sh"]
 CMD python3 server.py
 
 EXPOSE 8080
