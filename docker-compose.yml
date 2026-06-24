@@ -14,4 +14,4 @@ services:
             - OPEN_ELEVATION_AUTO_DOWNLOAD_DATA=true
         command: stdbuf -i0 -o0 -e0 python3 server.py
         ports:
-            - 8080:8080
+            - 14599:8080
