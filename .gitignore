@@ -1,5 +1,7 @@
 __pycache__/
 *.pyc
-data/
+data/*
+!data/.gitkeep
 .idea/
-certs/
+certs/*
+!certs/.gitkeep
