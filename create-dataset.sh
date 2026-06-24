@@ -31,6 +31,8 @@ cd "$OUTDIR"
 section "Open-Elevation whole-world dataset build"
 echo "Data directory: $OUTDIR"
 echo "This downloads, extracts, and tiles the SRTM 250m dataset."
+echo "Removing stale summary index, if present."
+rm -f "$OUTDIR/summary.json"
 
 "$SCRIPT_DIR/download-srtm-data.sh"
 

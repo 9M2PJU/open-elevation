@@ -34,6 +34,7 @@ MAX_LON="$OPEN_ELEVATION_REGION_MAX_LONGITUDE"
 MAX_LAT="$OPEN_ELEVATION_REGION_MAX_LATITUDE"
 
 mkdir -p "$OUTDIR"
+rm -f "$OUTDIR/summary.json"
 
 if ! find "$SOURCE_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
     echo "No source GeoTIFF files found in $SOURCE_DIR."

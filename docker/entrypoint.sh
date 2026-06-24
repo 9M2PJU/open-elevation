@@ -8,20 +8,44 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 mkdir -p "$DATA_DIR"
 
-if [ "$AUTO_BUILD_REGION" = "true" ] && ! find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+has_any_geotiff() {
+    find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .
+}
+
+has_runtime_tiles() {
+    find "$DATA_DIR" -maxdepth 1 -regextype posix-extended -regex '.*/.*_[0-9]+_[0-9]+\.tif' -print -quit | grep -q .
+}
+
+has_raw_world_rasters() {
+    find "$DATA_DIR" -maxdepth 1 \( \
+        -name 'SRTM_NE_250m.tif' -o \
+        -name 'SRTM_SE_250m.tif' -o \
+        -name 'SRTM_W_250m.tif' \
+    \) -print -quit | grep -q .
+}
+
+if [ "$AUTO_BUILD_REGION" = "true" ] && ! has_runtime_tiles; then
     echo "Open-Elevation dataset mode: regional"
-    echo "No GeoTIFF files found in $DATA_DIR; building a regional dataset."
+    echo "No tiled runtime GeoTIFF files found in $DATA_DIR; building a regional dataset."
     "$SCRIPT_DIR/create-region-dataset.sh"
-elif [ "$AUTO_DOWNLOAD" = "true" ] && ! find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+elif [ "$AUTO_DOWNLOAD" = "true" ] && ! has_runtime_tiles; then
     echo "Open-Elevation dataset mode: whole world"
-    echo "No GeoTIFF files found in $DATA_DIR; downloading the whole-world SRTM dataset."
+    if has_raw_world_rasters; then
+        echo "Found raw SRTM source rasters but no tiled runtime dataset."
+        echo "Building tiles before starting the API."
+    elif has_any_geotiff; then
+        echo "Found GeoTIFF files, but none look like Open-Elevation tiled runtime data."
+        echo "Building the whole-world tiled dataset before starting the API."
+    else
+        echo "No GeoTIFF files found in $DATA_DIR; downloading the whole-world SRTM dataset."
+    fi
     "$SCRIPT_DIR/create-dataset.sh"
-elif find "$DATA_DIR" -maxdepth 1 -name '*.tif' -print -quit | grep -q .; then
+elif has_runtime_tiles; then
     echo "Open-Elevation dataset mode: existing data"
-    echo "Found GeoTIFF files in $DATA_DIR; skipping dataset download/build."
+    echo "Found tiled runtime GeoTIFF files in $DATA_DIR; skipping dataset download/build."
 else
     echo "Open-Elevation dataset mode: no automatic dataset build"
-    echo "No GeoTIFF files found in $DATA_DIR."
+    echo "No tiled runtime GeoTIFF files found in $DATA_DIR."
 fi
 
 exec "$@"

@@ -19,8 +19,6 @@ class GDALAxisOrderTests(unittest.TestCase):
         fake_osr.OAMS_TRADITIONAL_GIS_ORDER = "traditional"
         fake_osgeo.gdal = types.ModuleType("osgeo.gdal")
         fake_osgeo.osr = fake_osr
-        fake_lazy = types.ModuleType("lazy")
-        fake_lazy.lazy = property
         fake_rtree = types.ModuleType("rtree")
         fake_rtree_index = types.ModuleType("rtree.index")
         fake_rtree.index = fake_rtree_index
@@ -31,7 +29,6 @@ class GDALAxisOrderTests(unittest.TestCase):
                 "osgeo",
                 "osgeo.gdal",
                 "osgeo.osr",
-                "lazy",
                 "rtree",
                 "rtree.index",
                 "gdal_interfaces",
@@ -40,7 +37,6 @@ class GDALAxisOrderTests(unittest.TestCase):
         sys.modules["osgeo"] = fake_osgeo
         sys.modules["osgeo.gdal"] = fake_osgeo.gdal
         sys.modules["osgeo.osr"] = fake_osr
-        sys.modules["lazy"] = fake_lazy
         sys.modules["rtree"] = fake_rtree
         sys.modules["rtree.index"] = fake_rtree_index
         sys.modules.pop("gdal_interfaces", None)

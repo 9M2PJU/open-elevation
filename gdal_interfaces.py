@@ -1,6 +1,5 @@
 import os
 from osgeo import gdal, osr
-from lazy import lazy
 from os import listdir
 from os.path import isfile, join, getsize
 import json
@@ -56,13 +55,6 @@ class GDALInterface(object):
         self.geo_transform_inv = (gt[0], gt[5] / dev, -gt[2] / dev,
                                   gt[3], -gt[4] / dev, gt[1] / dev)
 
-
-
-    @lazy
-    def points_array(self):
-        b = self.src.GetRasterBand(1)
-        return b.ReadAsArray()
-
     def print_statistics(self):
         print(self.src.GetRasterBand(1).GetStatistics(True, True))
 
@@ -81,7 +73,8 @@ class GDALInterface(object):
             ylin = int(self.geo_transform_inv[4] * u + self.geo_transform_inv[5] * v)
 
             # look the value up
-            v = self.points_array[ylin, xpix]
+            b = self.src.GetRasterBand(1)
+            v = b.ReadAsArray(xpix, ylin, 1, 1)[0, 0]
 
             return v if v != -32768 else self.SEA_LEVEL
         except Exception as e:
