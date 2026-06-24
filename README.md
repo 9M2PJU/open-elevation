@@ -20,4 +20,27 @@ Please consider donating to keep the public API alive. This API is **used by mil
 
 You can donate [by following this link](https://www.open-elevation.com/#donate).
 
+## Docker Compose Dataset Modes
+
+`docker-compose.yml` exposes dataset switches under `services.server.environment`.
+
+By default, Open-Elevation downloads and builds the whole-world SRTM dataset when `./data` has no `.tif` files:
+
+```yaml
+OPEN_ELEVATION_AUTO_DOWNLOAD_DATA: "true"
+OPEN_ELEVATION_AUTO_BUILD_REGION: "false"
+```
+
+To build only a specific latitude/longitude region, place source GeoTIFF files in `./source-data`, then enable regional mode and fill all four bounds:
+
+```yaml
+OPEN_ELEVATION_AUTO_DOWNLOAD_DATA: "true"
+OPEN_ELEVATION_AUTO_BUILD_REGION: "true"
+OPEN_ELEVATION_REGION_MIN_LATITUDE: "1.0"
+OPEN_ELEVATION_REGION_MAX_LATITUDE: "2.0"
+OPEN_ELEVATION_REGION_MIN_LONGITUDE: "103.0"
+OPEN_ELEVATION_REGION_MAX_LONGITUDE: "104.0"
+```
+
+Regional mode runs before whole-world mode. It clips the mounted source GeoTIFFs into `./data` and tiles only that area. It does not download regional source data by itself; your source files must already cover the requested bounding box.
 

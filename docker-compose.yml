@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
     server:
         restart: always
@@ -8,10 +6,26 @@ services:
             dockerfile: ./docker/Dockerfile
         volumes:
             - "./data:/code/data"
+            - "./source-data:/code/source-data"
             - "./certs:/code/certs"
         environment:
-            - PYTHONUNBUFFERED=1
-            - OPEN_ELEVATION_AUTO_DOWNLOAD_DATA=true
+            PYTHONUNBUFFERED: "1"
+
+            # Default mode: download and build the whole-world SRTM dataset
+            # when ./data has no .tif files.
+            OPEN_ELEVATION_AUTO_DOWNLOAD_DATA: "true"
+
+            # Optional mode: build only a bounding-box dataset from source
+            # GeoTIFF files mounted in ./source-data. When true, this runs
+            # before whole-world mode and all four bounds must be filled in.
+            OPEN_ELEVATION_AUTO_BUILD_REGION: "false"
+            OPEN_ELEVATION_SOURCE_DATA_DIR: "/code/source-data"
+            OPEN_ELEVATION_REGION_MIN_LATITUDE: ""
+            OPEN_ELEVATION_REGION_MAX_LATITUDE: ""
+            OPEN_ELEVATION_REGION_MIN_LONGITUDE: ""
+            OPEN_ELEVATION_REGION_MAX_LONGITUDE: ""
+            OPEN_ELEVATION_REGION_X_TILES: "4"
+            OPEN_ELEVATION_REGION_Y_TILES: "4"
         command: stdbuf -i0 -o0 -e0 python3 server.py
         ports:
             - 14599:8080
